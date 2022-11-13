@@ -3,11 +3,20 @@ int bool_puch = 0;
 task color(){
 
 	short codeCouleur =0;
+	int red = 0;
+	int blue = 0;
+	int green = 0;
 
 	codeCouleur = getColorName(S1);
 
+	getColorRawRGB(S1, red, blue, green);
 
-	if(codeCouleur == 2){
+	displayTextLine(1, "red %d", red);
+	displayTextLine(2, "blue %d", blue);
+	displayTextLine(3, "green %d", green);
+
+
+	/*if(codeCouleur == 2){
 			displayTextLine(4, "bleu");
 			//setMotorSpeed(motorD, -30);
 			//sleep(2000);
@@ -27,12 +36,9 @@ task color(){
 			//setMotorSpeed(motorD, -30);
 			//sleep(2000);
 		}
-		/*else if(codeCouleur == 1){
-			displayTextLine(4, "noir");
-		}*/
 		else{
 			displayTextLine(4, "codeCouleur %d", codeCouleur);
-		}
+		}*/
 		sleep(1000);
 }
 
@@ -50,9 +56,11 @@ task poussoir(){
 
 	if(p == 1){
 
-			moveMotor(motorD, 360, degrees, 60);
-			setMotorSpeed(motorA, 20);
-			resetMotorEncoder(motorD);
+			moveMotor(motorA, 360, degrees, 60);
+			setMotorSpeed(motorB, 20);
+			resetMotorEncoder(motorA);
+
+
 	}
 
 	p = 0;
@@ -63,15 +71,20 @@ task poussoir(){
 
 task tapis(){
 
-	setMotorSpeed(motorA, 50);
+	setMotorSpeed(motorB, 30);
 }
 
+task tapis2(){
+
+	setMotorSpeed(motorD, 20);
+}
 
 
 task main()
 {
 	SensorType[S3] = sensorEV3_Touch;
 	SensorType[S1] = sensorEV3_Color;
+
 	setSensorMode(S1, modeEV3Color_Color);
 
 	while(1){
@@ -79,11 +92,27 @@ task main()
 		while(!bool_puch){
 			startTask(color);
 			startTask(tapis);
+			startTask(tapis2);
 		}
 		bool_puch = 0;
 		stopTask(color);
 		stopTask(poussoir);
 		stopTask(tapis);
+		stopTask(tapis2);
+
+
+		if(getButtonPress(buttonLeft) == true){
+			stopMotor(motorB);
+			setLEDColor(ledOrange);
+			playTone(310);
+			sleep(100);
+			clearSounds();
+			setLEDColor(ledGreen);
+		}
+		if(getButtonPress(buttonRight) == true){
+			stopMotor(motorD);
+			sleep(1000);
+		}
 	}
 
 }
